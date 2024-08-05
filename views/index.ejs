@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+    <form action="/graphData" method="POST" class="select"> 
+        <div class="container-fluid">
+            <div class="form-group col-sm-8">
+                <label for="myMultiselect">Choose the items</label>
+                <div id="myMultiselect" class="multiselect">
+                    <div id="mySelectLabel" class="selectBox" onclick="toggleCheckboxArea()">
+                        <select class="form-select" name="items" multiple>
+                            <option>Nothing is selected</option>
+                        </select>
+                        <div class="overSelect"></div>
+                    </div>
+                    <div id="mySelectOptions">
+                        <label for="one"><input type="checkbox" id="one" name="items" value="Apple" onchange="checkboxStatusChange()" /> Apple</label>
+                        <label for="two"><input type="checkbox" id="two" name="items" value="Orange" onchange="checkboxStatusChange()"/> Orange</label>
+                        <label for="three"><input type="checkbox" id="three" name="items" value="Mango" onchange="checkboxStatusChange()" /> Mango</label>
+                        <!-- <label for="four"><input type="checkbox" id="four" value="Grapes" onchange="checkboxStatusChange()" disabled /> Grapes</label>
+                        <label for="five"><input type="checkbox" id="five" value="Banana" onchange="checkboxStatusChange()" disabled /> Banana</label> -->
+                    </div>
+                </div>
+                <button type="submit">Submit</button>
+                
+            </div>
+         
+        </div>
+    </form>
+    <div class="table-container">
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th> Name </th>
+                    <th>Rate</th>
+                    <th>Quantity</th>
+                    <th>Amount</th>
+                    <th>Discount</th>
+                    <th>Taxable Amount</th>
+                    <th>GST %</th>
+                    <th>GST Amount</th>
+                    <th>Final Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (graphData && graphData.length > 0) { %>
+                    <% graphData.forEach(item => { %>
+                        <% if (item.Items.Apple_quantity) { %>
+                            <% item.Items.Apple_quantity.forEach(detail => { %>
+                                <% const id = Object.keys(detail)[0]; %>
+                                <% const details = detail[id]; %>
+                                <tr>
+                                    <td><%= details.date %></td>
+                                    <td><%= item.Items.products.Pname %></td>
+                                    <td><%= details.rate %></td>
+                                    <td><%= details.quantity %></td>
+                                    <td><%= details.amount %></td>
+                                    <td><%= details.discount %></td>
+                                    <td><%= details.taxableAmount %></td>
+                                    <td><%= details.gst %></td>
+                                    <td><%= details.gstamount%></td>                                  
+                                    <td><%= details.finalamount %></td>
+                                </tr>
+                            <% }); %>
+                        <% } else if (item.Items.orange_quantity) { %>
+                            <% item.Items.orange_quantity.forEach(detail => { %>
+                                <% const id = Object.keys(detail)[0]; %>
+                                <% const details = detail[id]; %>
+                                <tr>
+                                    <td><%= details.date %></td>
+                                    <td><%= item.Items.products.Pname %></td>
+                                    <td><%= details.rate %></td>
+                                    <td><%= details.quantity %></td>
+                                    <td><%= details.amount %></td>
+                                    <td><%= details.discount %></td>
+                                    <td><%= details.taxableAmount %></td>
+                                    <td><%= details.gst %></td>
+                                    <td><%= details.gstamount%></td>                                  
+                                    <td><%= details.finalamount %></td>
+                                </tr>
+                            <% }); %>
+                        <% } else if (item.Items.P_quantity) { %>
+                            <% item.Items.P_quantity.forEach(detail => { %>
+                                <% const id = Object.keys(detail)[0]; %>
+                                <% const details = detail[id]; %>
+                                <tr>
+                                    <td><%= details.date %></td>
+                                    <td><%= item.Items.products.Pname %></td>
+                                    <td><%= details.rate %></td>
+                                    <td><%= details.quantity %></td>
+                                    <td><%= details.amount %></td>
+                                    <td><%= details.discount %></td>
+                                    <td><%= details.taxableAmount %></td>
+                                    <td><%= details.gst %></td>
+                                    <td><%= details.gstamount%></td>                                  
+                                    <td><%= details.finalamount %></td>
+                                </tr>
+                            <% }); %>
+                        <% } %>
+                    <% }); %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="8">Select a valid option</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+        <div class="pagination">
+            <button id="prevPage" onclick="changePage(-1)">Previous</button>
+            <span id="pageInfo"></span>
+            <button id="nextPage" onclick="changePage(1)">Next</button>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const rowsPerPage = 3;
+        const table = document.getElementById('dataTable');
+        const tbody = table.querySelector('tbody');
+        const totalPages = Math.ceil(tbody.rows.length / rowsPerPage);
+        
+        function displayTable(page) {
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+
+            for (let i = 0; i < tbody.rows.length; i++) {
+                tbody.rows[i].style.display = i >= start && i < end ? '' : 'none';
+            }
+
+            document.getElementById('prevPage').style.display = page === 1 ? 'none' : '';
+            document.getElementById('nextPage').style.display = page === totalPages ? 'none' : '';
+            document.getElementById('pageInfo').textContent = `Page ${page} of ${totalPages}`;
+        }
+
+        function changePage(step) {
+            currentPage += step;
+            if (currentPage < 1) currentPage = 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            displayTable(currentPage);
+        }
+
+        window.onload = (event) => {
+            initMultiselect();
+            displayTable(currentPage);
+        };
+
+        function initMultiselect() {
+            checkboxStatusChange();
+
+            document.addEventListener("click", function(evt) {
+                var flyoutElement = document.getElementById('myMultiselect'),
+                    targetElement = evt.target; 
+
+                do {
+                    if (targetElement == flyoutElement) {
+                        return;
+                    }
+                    targetElement = targetElement.parentNode;
+                } while (targetElement);
+
+                toggleCheckboxArea(true);
+            });
+        }
+
+        function checkboxStatusChange() {
+            var multiselect = document.getElementById("mySelectLabel");
+            var multiselectOption = multiselect.getElementsByTagName('option')[0];
+
+            var values = [];
+            var checkboxes = document.getElementById("mySelectOptions");
+            var checkedCheckboxes = checkboxes.querySelectorAll('input[type=checkbox]:checked');
+
+            for (const item of checkedCheckboxes) {
+                var checkboxValue = item.getAttribute('value');
+                values.push(checkboxValue);
+            }
+
+            var dropdownValue = "Nothing is selected";
+            if (values.length > 0) {
+                dropdownValue = values.join(', ');
+            }
+
+            multiselectOption.innerText = dropdownValue;
+        }
+
+        function toggleCheckboxArea(onlyHide = false) {
+            var checkboxes = document.getElementById("mySelectOptions");
+            var displayValue = checkboxes.style.display;
+
+            if (displayValue != "block") {
+                if (onlyHide == false) {
+                    checkboxes.style.display = "block";
+                }
+            } else {
+                checkboxes.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
