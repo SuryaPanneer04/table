@@ -32,6 +32,12 @@
          
         </div>
     </form>
+
+    <!-- Search Box -->
+    <div class="search-container">
+        <input type="text" id="searchBox" placeholder="Search..." onkeyup="searchTable()" />
+    </div>
+
     <div class="table-container">
         <table id="dataTable">
             <thead>
@@ -106,7 +112,7 @@
                     <% }); %>
                 <% } else { %>
                     <tr>
-                        <td colspan="8">Select a valid option</td>
+                        <td colspan="10">Select a valid option</td>
                     </tr>
                 <% } %>
             </tbody>
@@ -119,12 +125,15 @@
     </div>
 
     <script>
+
+        // move on next page
+
         let currentPage = 1;
         const rowsPerPage = 3;
         const table = document.getElementById('dataTable');
         const tbody = table.querySelector('tbody');
         const totalPages = Math.ceil(tbody.rows.length / rowsPerPage);
-        
+
         function displayTable(page) {
             const start = (page - 1) * rowsPerPage;
             const end = start + rowsPerPage;
@@ -145,6 +154,29 @@
             displayTable(currentPage);
         }
 
+        //   searchTable
+
+        function searchTable() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const rows = tbody.getElementsByTagName('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let rowContainsSearchTerm = false;
+
+                for (let j = 0; j < cells.length; j++) {
+                    if (cells[j].textContent.toLowerCase().includes(searchTerm)) {
+                        rowContainsSearchTerm = true;
+                        break;
+                    }
+                }
+
+                rows[i].style.display = rowContainsSearchTerm ? '' : 'none';
+            }
+        }
+            
+        // checkboxes
+        
         window.onload = (event) => {
             initMultiselect();
             displayTable(currentPage);
